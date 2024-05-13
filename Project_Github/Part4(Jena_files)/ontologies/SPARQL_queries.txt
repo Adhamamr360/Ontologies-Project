@@ -1,0 +1,279 @@
+1.	List the instances of the class Actor
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?actor
+	WHERE { ?actor rdf:type ex:Actor. }
+2.	List the instances of the class writer
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?writer
+	WHERE { ? writer rdf:type ex: Writer. }
+
+3.	List the instances of the class director
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?director
+	WHERE { ? director rdf:type ex: Director. }
+
+4.	List the name of all Thriller movies. For each one, display its director
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?movieName ?directorName
+WHERE {
+  ?movie rdf:type ex:Movie.
+  ?movie ex:HasGenre ex:Thriller.
+  ?movie ex:HasDirector ?director.
+  ?director ex:name ?directorName.
+  ?movie ex:title ?movieName.
+}
+
+5.	List the name of all Crime Thriller movies
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?movieName
+WHERE {
+  ?movie rdf:type ex:Movie.
+  ?movie ex:HasGenre ex:Crime.
+  ?movie ex:HasGenre ex:Thriller.
+  ?movie ex:title ?movieName.
+}
+
+
+6.	list the male actors in the movie in specific film
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?actorName
+WHERE {
+  ?movie rdf:type ex:Movie;
+        ex:title ?title;
+        ex:HasActor ?actor.
+  ?actor rdf:type ex:Actor;
+         ex:gender ?gender;
+         ex:name ?actorName.
+FILTER(?gender = "Male" && ?title = "Inception")}
+
+7.	How many movies have both "Action" and "Thriller" as genres?
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT (COUNT(?movie) AS ?count)
+WHERE {
+  ?movie rdf:type ex:Movie.
+  ?movie ex:HasGenre ex:Action.
+  ?movie ex:HasGenre ex:Thriller.
+}
+
+8.	List all the movies written by a specific writer
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?movieTitle
+WHERE {
+  ?movie rdf:type ex:Movie;
+        ex:HasWriter ex:EdgarWright;
+        ex:title ?movieTitle.
+}
+
+9.	Find movies with a certain language.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?actorName
+WHERE {
+  ?actor rdf:type ex:Actor;
+         ex:age ?age;
+         ex:name ?actorName.
+  FILTER(?age > 51)
+}
+
+10.	List the name of Actors older than 51 years.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?movieTitle
+WHERE {
+  ?movie rdf:type ex:Movie;
+        ex:language ?language;
+        ex:title ?movieTitle.
+  FILTER(?language = "Arabic")
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1.	In this example, the query selects actors and includes optional graph patterns to retrieve age and nationality if available. The OPTIONAL keyword is used to specify the optional graph patterns.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT DISTINCT ?name ?age ?nationality
+WHERE {
+      ?actor rdf:type ex:Actor.
+      ?actor ex:name ?name.
+      OPTIONAL {
+           ?actor ex:age ?age
+   }
+      OPTIONAL {
+           ?actor ex:nationality ?nationality
+   }
+}
+2.	This SPARQL query retrieves information about movies, including their titles, directors, and actors. It employs two alternatives (using UNION) and conjunctions (using FILTER) to combine patterns for extracting data related to directors and actors.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+SELECT ?movieTitle ?directorName ?actorName
+WHERE {
+  {  ?movie rdf:type ex:Movie;
+          ex:title ?movieTitle.
+    ?movie ex:HasDirector ?director.
+    ?director ex:name ?directorName.
+    FILTER(?directorName = "Sandra Nashaat")}
+  UNION
+   { ?movie rdf:type ex:Movie;
+          ex:title ?movieTitle.
+    ?movie ex:HasActor ?actor.
+    ?actor ex:name ?actorName.
+    FILTER(?actorName = "John Travolta")}}
+
+3.	CONSTRUCT a new RDF graph that includes individuals who are both actors and directors.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX movie:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+CONSTRUCT {
+    ?person rdf:type movie:ActorDirector .
+}
+WHERE {
+    ?person rdf:type movie:Actor .
+    ?person rdf:type movie:Director .
+}
+
+4.	In this example, the ASK query form is used to check if there are any resources that match the specified patterns in the WHERE clause.
+The WHERE clause contains patterns that describe the conditions that need to be satisfied for the query to return a boolean result. In this case, it checks if there is a resource of type "Movie" with the title "Baby Driver".
+When you execute this query, the result will be a boolean value indicating whether there are any resources that match the specified patterns. If there are matches, the result will be true; otherwise, it will be false.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+ASK
+WHERE {
+  ?movie rdf:type ex:Movie;
+        ex:title ?title;
+        ex:title ?movieTitle.
+  FILTER(?title = "Baby Driver")}
+
+5.	In this example, the DESCRIBE query form is used to retrieve information about a specific resource (Director). The DESCRIBE query returns a description of the specified resource, including its properties and connected resources.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+DESCRIBE ex:Director
+
+6.	This query provides a simple way to retrieve information about movies directed by Quentin Tarantino, including their titles and genres..
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>	
+
+SELECT ?movieTitle ?genre
+WHERE {
+    ?movie rdf:type ex:Movie .
+    ?movie ex:HasDirector ex:QuentinTarantino .
+    ?movie ex:title ?movieTitle .
+    ?movie ex:HasGenre ?genre .
+}
+
+7.	In this example, We List all actors who have appeared in movies released before 2010.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+
+SELECT ?actor
+WHERE {
+    ?movie rdf:type ex:Movie .
+    ?movie ex:HasActor ?actor .
+    ?movie ex:year ?year .
+    FILTER (?year < 2010)
+}
+
+8.	In this example, We Find the nationality of the director of a specific movie (e.g., Pulp Fiction).
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+
+SELECT ?nationality
+WHERE {
+    ex:PulpFictionMovie rdf:type ex:Movie .
+    ex:PulpFictionMovie ex:HasDirector ?director .
+    ?director ex:nationality ?nationality .
+}
+
+9.	In this example, We List all movies where the writer also appeared as an actor and the writer/actor name.
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex:<http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+
+SELECT ?movie ?writer
+WHERE {
+    ?movie rdf:type ex:Movie .
+    ?movie ex:HasWriter ?writer .
+    ?movie ex:HasActor ?writer .
+}
+
+10.	This query provides a way to retrieve information about movies released in a specific country along with their directors (e.g., USA).
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ex: <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#>
+
+SELECT ?movieTitle ?directorName
+WHERE {
+    ?movie rdf:type ex:Movie .
+    ?movie ex:title ?movieTitle .
+    ?movie ex:HasDirector ?director .
+    ?director ex:name ?directorName .
+    ?movie ex:country ?country .
+    FILTER regex(?country, "USA", "i") .
+}
+
+
+
+
+
