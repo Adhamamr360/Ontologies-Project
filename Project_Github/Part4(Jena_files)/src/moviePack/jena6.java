@@ -1,76 +1,133 @@
 package moviePack;
 
-import java.io.InputStream;
+
+
 import org.apache.jena.query.*;
+
+import org.apache.jena.rdf.model.InfModel;
+
 import org.apache.jena.rdf.model.Model;
+
 import org.apache.jena.rdf.model.ModelFactory;
+
 import org.apache.jena.util.FileManager;
 
+import org.apache.jena.reasoner.Reasoner;
+
+import org.apache.jena.reasoner.rulesys.*;
+
+import org.apache.jena.vocabulary.RDF;
+
+
+
 public class jena6 {
+
     public static void main(String[] args) {
+
         // Load the ontology
+
         Model model = ModelFactory.createDefaultModel();
+
         FileManager fileManager = FileManager.get();
+
         String owlFile = "Data/movie.owl"; // Replace with the actual filename
+
         model.read(fileManager.open(owlFile), null);
 
-        // Rule 1: Movies directed by Quentin Tarantino
-        askMoviesDirectedByQuentinTarantino(model);
 
-        // Rule 2: Actors who appeared in movies released before 2010
-        askActorsInMoviesBefore2010(model);
 
-        // Rule 3: Movies released in a specific country along with their directors
-        askMoviesInCountry(model, "USA");
+        // Define rules
+
+        String rule1 = "[ruleHasTwoRoles: (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasActor> ?person) (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasDirector> ?person) -> (?person <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasTwoRoles> ?movie)]";
+
+        String rule2 = "[ruleMoviesDirectedByQT: (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasDirector> <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#QuentinTarantino>) -> (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#DirectedByQT> ?movie)]";
+
+        String rule3 = "[ruleMoviesInUSA: (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#country> \"USA\"^^xsd:string) (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasDirector> ?director) -> (?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#DirectorName> ?director)]";
+
+
+
+        // Create a reasoner with the rules
+
+        Reasoner reasoner = new GenericRuleReasoner(Rule.parseRules(rule1 + " " + rule2 + " " + rule3));
+
+
+
+        // Apply the reasoner to the model
+
+        InfModel infModel = ModelFactory.createInfModel(reasoner, model);
+
+
+
+        // Execute queries
+
+
+
+        askForTwoRoles(infModel);
+
+        askMoviesDirectedByQuentinTarantino(infModel);
+
+        askMoviesInCountry(infModel, "USA");
+
     }
 
-    // Rule 1: Movies directed by Quentin Tarantino
+
+
+ // Rule 1: Persons Who Are Actors And Directors
+
+    private static void askForTwoRoles(Model model) {
+
+        System.out.println("Persons who are actors and directors:");
+
+        String queryString = "SELECT ?person WHERE {?person <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#HasTwoRoles> ?movie}";
+
+        executeAndPrintQuery(model, queryString);
+
+    }
+
+
+
+
+
+    // Rule 2: Movies Directed by Quentin Tarantino
+
     private static void askMoviesDirectedByQuentinTarantino(Model model) {
+
         System.out.println("Movies directed by Quentin Tarantino:");
-        String queryFile = "Data/ask_director.txt";
-        String queryString = readQueryFromFile(queryFile);
+
+        String queryString = "SELECT ?movieTitle WHERE {?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#DirectedByQT> ?movie . ?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#title> ?movieTitle}";
+
         executeAndPrintQuery(model, queryString);
+
     }
 
-    // Rule 2: Actors who appeared in movies released before 2010
-    private static void askActorsInMoviesBefore2010(Model model) {
-        System.out.println("Actors who appeared in movies released before 2010:");
-        String queryFile = "Data/ask_before_2010.txt";
-        String queryString = readQueryFromFile(queryFile);
-        executeAndPrintQuery(model, queryString);
-    }
 
-    // Rule 3: Movies released in a specific country along with their directors
+
+    // Rule 3: Movies Released in a Specific Country with Directors' Names
+
     private static void askMoviesInCountry(Model model, String country) {
+
         System.out.println("Movies released in " + country + " along with their directors:");
-        String queryFile = "Data/ask_movies_in_country.txt";
-        String queryString = readQueryFromFile(queryFile);
+
+        String queryString = "SELECT ?movieTitle ?director WHERE {?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#DirectorName> ?director . ?movie <http://www.semanticweb.org/mariam/ontologies/2024/3/movie#title> ?movieTitle}";
+
         executeAndPrintQuery(model, queryString);
+
     }
 
-    // Helper method to read the query from file
-    private static String readQueryFromFile(String queryFile) {
-        StringBuilder sb = new StringBuilder();
-        try (InputStream inputStream = FileManager.get().open(queryFile)) {
-            if (inputStream != null) {
-                String line;
-                java.io.BufferedReader reader = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(inputStream, "UTF-8"));
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-            }
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
+
 
     // Helper method to execute and print query results
+
     private static void executeAndPrintQuery(Model model, String queryString) {
-        try (QueryExecution qexec = QueryExecutionFactory.create(QueryFactory.create(queryString), model)) {
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(queryString, model)) {
+
             ResultSet results = qexec.execSelect();
+
             ResultSetFormatter.out(System.out, results);
+
         }
+
     }
+
 }
